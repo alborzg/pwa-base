@@ -9,12 +9,14 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
-        name: 'PWA Base',
-        short_name: 'PWABase',
-        description: 'A simple PWA template',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        name: 'Progressive Web App - Proof of Concept',
+        short_name: 'PWA Demo',
+        description: 'A demonstration of Progressive Web App capabilities built with React, Vite, and modern web technologies',
+        theme_color: '#4299e1',
+        background_color: '#f5f7fa',
         display: 'standalone',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: 'pwa-192x192.png',

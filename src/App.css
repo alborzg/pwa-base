@@ -1,34 +1,211 @@
 .App {
-  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  line-height: 1.6;
+  color: #2c3e50;
 }
 
-h1 {
-  font-size: 3rem;
-  margin-bottom: 2rem;
-  color: #333;
+/* Header Styles */
+.app-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e9ecef;
 }
 
+.app-header h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1a202c;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.app-header h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0.5rem 0 0 0;
+  color: #718096;
+}
+
+/* Main Content */
+.app-content {
+  display: grid;
+  gap: 3rem;
+}
+
+/* Section Styles */
+section {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e2e8f0;
+}
+
+section h3 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: #2d3748;
+  border-bottom: 2px solid #4299e1;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+section p {
+  font-size: 1.125rem;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* Features List */
+.features ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+}
+
+.features li {
+  padding: 0.75rem 0;
+  font-size: 1.125rem;
+  color: #4a5568;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.features li:last-child {
+  border-bottom: none;
+}
+
+.features strong {
+  color: #2d3748;
+}
+
+/* Installation Instructions */
+.install-instructions {
+  display: grid;
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+
+.platform {
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #4299e1;
+}
+
+.platform h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: #2d3748;
+}
+
+.platform ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.platform li {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+/* Install Button */
 .install-button {
-  background-color: #007AFF;
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
   color: white;
   border: none;
-  padding: 12px 24px;
-  font-size: 16px;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 1rem;
-  transition: background-color 0.2s;
+  margin-top: 2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .install-button:hover {
-  background-color: #0056CC;
+  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(66, 153, 225, 0.4);
 }
 
+.install-button:active {
+  transform: translateY(0);
+}
+
+/* Tech Stack Badges */
+.tech-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  .App {
+    padding: 1rem;
+  }
+  
+  .app-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .app-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  section {
+    padding: 1.5rem;
+  }
+  
+  section h3 {
+    font-size: 1.5rem;
+  }
+  
   .install-button {
-    padding: 16px 32px;
-    font-size: 18px;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+  
+  .tech-badges {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+  
+  section {
+    padding: 1rem;
+  }
+  
+  .platform {
+    padding: 1rem;
   }
 }

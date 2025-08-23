@@ -64,6 +64,16 @@ function App() {
                 <li>The app will be added to your desktop and start menu</li>
               </ul>
             </div>
+
+            <div className="platform">
+              <h4>🖥️ macOS Safari</h4>
+              <ul>
+                <li>Click "File" in the menu bar, then "Add to Dock"</li>
+                <li>Or use the Share button and select "Add to Dock"</li>
+                <li>The app will appear in your Dock as a standalone application</li>
+                <li>Note: Requires Safari 14+ and macOS Big Sur or later</li>
+              </ul>
+            </div>
             
             <div className="platform">
               <h4>📱 Mobile (Android)</h4>

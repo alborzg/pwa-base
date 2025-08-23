@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      includeAssets: ['favicon-16x16.png', 'favicon-32x32.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'Progressive Web App - Proof of Concept',
         short_name: 'PWA Demo',
@@ -18,6 +18,11 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         icons: [
+          {
+            src: 'pwa-144x144.png',
+            sizes: '144x144',
+            type: 'image/png'
+          },
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',

@@ -4,6 +4,8 @@ import './App.css'
 function App() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [showInstallButton, setShowInstallButton] = useState(false)
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [offlineInteractions, setOfflineInteractions] = useState(0)
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -15,6 +17,19 @@ function App() {
     window.addEventListener('beforeinstallprompt', handler)
 
     return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
   }, [])
 
   const handleInstallClick = async () => {
@@ -29,11 +44,19 @@ function App() {
     }
   }
 
+  const handleOfflineInteraction = () => {
+    setOfflineInteractions(prev => prev + 1)
+  }
+
   return (
     <div className="App">
       <header className="app-header">
         <h1>Progressive Web App</h1>
         <h2>Proof of Concept</h2>
+        <div className={`connection-status ${isOnline ? 'online' : 'offline'}`}>
+          {isOnline ? '🟢 Online' : '🔴 Offline'} - 
+          {isOnline ? ' Full functionality available' : ' Running from cache'}
+        </div>
       </header>
 
       <main className="app-content">
@@ -99,6 +122,51 @@ function App() {
               📲 Install This App
             </button>
           )}
+        </section>
+
+        <section className="offline-demo">
+          <h3>🔌 Offline Capabilities Demo</h3>
+          <div className="demo-content">
+            <p>
+              <strong>Try this:</strong> Turn off your internet connection (or enable airplane mode) 
+              and notice how this app continues to work! The service worker caches all the assets.
+            </p>
+            
+            <div className="offline-counter">
+              <button 
+                onClick={handleOfflineInteraction}
+                className="demo-button"
+                disabled={false}
+              >
+                📱 Click Me {offlineInteractions > 0 && `(${offlineInteractions})`}
+              </button>
+              <p className="counter-text">
+                This button works {isOnline ? 'online' : 'offline'}! 
+                {!isOnline && offlineInteractions > 0 && (
+                  <span className="offline-proof"> 
+                    ✨ You clicked {offlineInteractions} time{offlineInteractions !== 1 ? 's' : ''} while offline!
+                  </span>
+                )}
+              </p>
+            </div>
+
+            <div className="cache-status">
+              <h4>📦 What's Cached & Available Offline:</h4>
+              <ul>
+                <li>✅ All HTML, CSS, and JavaScript</li>
+                <li>✅ Persian lotus PWA icons</li>
+                <li>✅ App functionality (buttons, counters, etc.)</li>
+                <li>✅ This entire interface</li>
+              </ul>
+              
+              <p className="cache-note">
+                <strong>Service Worker Status:</strong> {isOnline ? 
+                  'Active and ready for offline mode' : 
+                  'Serving cached content - you\'re offline!'
+                }
+              </p>
+            </div>
+          </div>
         </section>
 
         <section className="tech-stack">

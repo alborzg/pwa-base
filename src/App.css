@@ -143,6 +143,129 @@ section p {
   transform: translateY(0);
 }
 
+/* Connection Status Indicator */
+.connection-status {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.connection-status.online {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(72, 187, 120, 0.3);
+}
+
+.connection-status.offline {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(245, 101, 101, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Offline Demo Styles */
+.offline-demo {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border: 2px solid #4299e1;
+}
+
+.demo-content {
+  margin-top: 1rem;
+}
+
+.offline-counter {
+  background: #2a2a2a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.demo-button {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(237, 137, 54, 0.3);
+  margin-bottom: 1rem;
+}
+
+.demo-button:hover {
+  background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(237, 137, 54, 0.4);
+}
+
+.demo-button:active {
+  transform: translateY(0);
+}
+
+.counter-text {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.offline-proof {
+  color: #48bb78;
+  font-weight: 600;
+}
+
+.cache-status {
+  background: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  border-left: 4px solid #48bb78;
+}
+
+.cache-status h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.cache-status ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+
+.cache-status li {
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid #333;
+}
+
+.cache-status li:last-child {
+  border-bottom: none;
+}
+
+.cache-note {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  padding: 1rem;
+  background: #2a2a2a;
+  border-radius: 6px;
+}
+
 /* Tech Stack Badges */
 .tech-badges {
   display: flex;
@@ -193,6 +316,20 @@ section p {
   
   .tech-badges {
     justify-content: center;
+  }
+  
+  .connection-status {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .demo-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .offline-counter, .cache-status {
+    padding: 1rem;
   }
 }
 

@@ -346,6 +346,163 @@ section p {
   margin: 0;
 }
 
+/* Fingerprinting Demo Styles */
+.fingerprint-demo {
+  background: linear-gradient(135deg, #742a2a 0%, #2d1b69 100%);
+  border: 2px solid #f56565;
+}
+
+.fingerprint-content {
+  margin-top: 1.5rem;
+}
+
+.fingerprint-warning {
+  background: #2d1b69;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #f56565;
+  margin-bottom: 2rem;
+}
+
+.fingerprint-warning h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: #fbb6ce;
+}
+
+.fingerprint-warning p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.fingerprint-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.fingerprint-score, .fingerprint-hash {
+  background: #2a2a2a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #ed8936;
+}
+
+.fingerprint-score h4, .fingerprint-hash h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.score-display {
+  text-align: center;
+}
+
+.score-number {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #f56565;
+  display: block;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.score-explanation {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0.5rem 0 0 0;
+  font-style: italic;
+}
+
+.hash-display {
+  text-align: center;
+}
+
+.fingerprint-code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 1.125rem;
+  color: #fbb6ce;
+  background: #1a1a1a;
+  padding: 1rem;
+  border-radius: 6px;
+  display: block;
+  word-break: break-all;
+  margin-bottom: 0.5rem;
+}
+
+.hash-explanation {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.fingerprint-components {
+  background: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #48bb78;
+  margin-bottom: 2rem;
+}
+
+.fingerprint-components h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.component-item {
+  background: #2a2a2a;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.component-item strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.privacy-protection {
+  background: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #4299e1;
+}
+
+.privacy-protection h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.privacy-protection ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.privacy-protection li {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.privacy-protection strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
 /* Tech Stack Badges */
 .tech-badges {
   display: flex;

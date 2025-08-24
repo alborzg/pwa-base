@@ -10,6 +10,8 @@ function App() {
   const [lastOnlineCheck, setLastOnlineCheck] = useState(Date.now())
   const [deviceInfo, setDeviceInfo] = useState<any>({})
   const [networkInfo, setNetworkInfo] = useState<any>({})
+  const [fingerprint, setFingerprint] = useState<string>('')
+  const [uniquenessScore, setUniquenessScore] = useState<number>(0)
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -176,10 +178,108 @@ function App() {
 
       setDeviceInfo(info)
       setNetworkInfo(netInfo)
+      
+      // Generate fingerprint
+      generateFingerprint(info, netInfo)
     }
 
     gatherDeviceInfo()
   }, [])
+
+  const generateFingerprint = async (deviceInfo: any, networkInfo: any) => {
+    try {
+      const components = []
+      
+      // Basic fingerprinting components
+      components.push(deviceInfo.userAgent || '')
+      components.push(`${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`)
+      components.push(deviceInfo.screenColorDepth || '')
+      components.push(deviceInfo.devicePixelRatio || '')
+      components.push(deviceInfo.platform || '')
+      components.push(deviceInfo.language || '')
+      components.push(deviceInfo.hardwareConcurrency || '')
+      components.push(new Date().getTimezoneOffset().toString())
+      components.push(deviceInfo.cookieEnabled ? '1' : '0')
+      
+      // Network info
+      components.push(networkInfo.effectiveType || '')
+      
+      // Canvas fingerprinting (simplified)
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.textBaseline = 'top'
+        ctx.font = '14px Arial'
+        ctx.fillText('Browser fingerprint test 🔍', 2, 2)
+        components.push(canvas.toDataURL().slice(-50)) // Last 50 chars
+      }
+      
+      // WebGL fingerprinting (simplified)
+      const webglCanvas = document.createElement('canvas')
+      const gl = webglCanvas.getContext('webgl') as WebGLRenderingContext || webglCanvas.getContext('experimental-webgl') as WebGLRenderingContext
+      if (gl) {
+        const renderer = gl.getParameter(gl.RENDERER)
+        const vendor = gl.getParameter(gl.VENDOR)
+        components.push(renderer || '')
+        components.push(vendor || '')
+      }
+      
+      // Font detection (simplified)
+      const testFonts = ['Arial', 'Times', 'Courier', 'Helvetica', 'Georgia']
+      const availableFonts = testFonts.filter(font => {
+        const span = document.createElement('span')
+        span.style.fontFamily = font
+        span.textContent = 'test'
+        document.body.appendChild(span)
+        const available = span.offsetWidth > 0
+        document.body.removeChild(span)
+        return available
+      })
+      components.push(availableFonts.join(','))
+      
+      // Audio context fingerprinting (simplified)
+      if ('AudioContext' in window || 'webkitAudioContext' in window) {
+        try {
+          const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
+          const oscillator = audioCtx.createOscillator()
+          const analyser = audioCtx.createAnalyser()
+          oscillator.connect(analyser)
+          components.push(audioCtx.sampleRate.toString())
+          audioCtx.close()
+        } catch (e) {
+          components.push('audio-unavailable')
+        }
+      }
+      
+      // Create hash from components
+      const fingerprintString = components.join('|')
+      const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(fingerprintString))
+      const hashArray = Array.from(new Uint8Array(hash))
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+      
+      setFingerprint(hashHex.slice(0, 16)) // First 16 chars for display
+      
+      // Calculate uniqueness score based on entropy of components
+      let entropy = 0
+      components.forEach(component => {
+        if (component && component.length > 0) {
+          // Simplified entropy calculation
+          const uniqueChars = new Set(component).size
+          entropy += Math.log2(uniqueChars + 1)
+        }
+      })
+      
+      // Convert to percentage (rough estimate)
+      const maxEntropy = 50 // Theoretical max
+      const uniquenessPercentage = Math.min(95, Math.max(60, (entropy / maxEntropy) * 100))
+      setUniquenessScore(Math.round(uniquenessPercentage))
+      
+    } catch (error) {
+      console.error('Fingerprinting failed:', error)
+      setFingerprint('unavailable')
+      setUniquenessScore(0)
+    }
+  }
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return
@@ -411,6 +511,87 @@ function App() {
             <div className="user-agent">
               <h4>🔍 User Agent</h4>
               <p className="user-agent-text">{deviceInfo.userAgent || 'Loading...'}</p>
+            </div>
+          </section>
+
+          <section className="fingerprint-demo">
+            <h3>🔍 Browser Fingerprinting Demo</h3>
+            <div className="fingerprint-content">
+              <div className="fingerprint-warning">
+                <h4>⚠️ Privacy Notice</h4>
+                <p>
+                  This demonstrates how websites can potentially track users without cookies. 
+                  This is for educational purposes only - we don't store or transmit this data.
+                </p>
+              </div>
+
+              <div className="fingerprint-results">
+                <div className="fingerprint-score">
+                  <h4>🎯 Uniqueness Score</h4>
+                  <div className="score-display">
+                    <span className="score-number">{uniquenessScore}%</span>
+                    <p className="score-explanation">
+                      {uniquenessScore >= 90 && "Highly unique - easily trackable"}
+                      {uniquenessScore >= 75 && uniquenessScore < 90 && "Quite unique - trackable"}
+                      {uniquenessScore >= 60 && uniquenessScore < 75 && "Moderately unique - somewhat trackable"}
+                      {uniquenessScore < 60 && "Low uniqueness - harder to track"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="fingerprint-hash">
+                  <h4>🔐 Browser Fingerprint</h4>
+                  <div className="hash-display">
+                    <code className="fingerprint-code">{fingerprint || 'Calculating...'}</code>
+                    <p className="hash-explanation">
+                      This unique identifier is generated from your browser and device characteristics.
+                      It changes when you update browsers, change settings, or use different devices.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="fingerprint-components">
+                <h4>📊 Tracking Components Used</h4>
+                <div className="component-grid">
+                  <div className="component-item">
+                    <strong>User Agent:</strong> Browser and OS info
+                  </div>
+                  <div className="component-item">
+                    <strong>Screen Resolution:</strong> {deviceInfo.screenWidth}×{deviceInfo.screenHeight}
+                  </div>
+                  <div className="component-item">
+                    <strong>Timezone:</strong> {new Date().getTimezoneOffset()} minutes offset
+                  </div>
+                  <div className="component-item">
+                    <strong>Language:</strong> {deviceInfo.language}
+                  </div>
+                  <div className="component-item">
+                    <strong>Canvas Rendering:</strong> Graphics fingerprint
+                  </div>
+                  <div className="component-item">
+                    <strong>WebGL Info:</strong> GPU details
+                  </div>
+                  <div className="component-item">
+                    <strong>Audio Context:</strong> Audio processing capabilities
+                  </div>
+                  <div className="component-item">
+                    <strong>Available Fonts:</strong> Installed font detection
+                  </div>
+                </div>
+              </div>
+
+              <div className="privacy-protection">
+                <h4>🛡️ How to Protect Your Privacy</h4>
+                <ul>
+                  <li><strong>Use Privacy-Focused Browsers:</strong> Firefox, Brave, or Safari with tracking protection</li>
+                  <li><strong>Enable Fingerprint Protection:</strong> Most modern browsers have anti-fingerprinting features</li>
+                  <li><strong>Use VPN:</strong> Masks your IP and some location-based tracking</li>
+                  <li><strong>Disable JavaScript:</strong> (Not practical, but stops most fingerprinting)</li>
+                  <li><strong>Use Incognito/Private Mode:</strong> Provides some protection</li>
+                  <li><strong>Browser Extensions:</strong> uBlock Origin, Privacy Badger</li>
+                </ul>
+              </div>
             </div>
           </section>
 

@@ -6,6 +6,8 @@ function App() {
   const [showInstallButton, setShowInstallButton] = useState(false)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   const [offlineInteractions, setOfflineInteractions] = useState(0)
+  const [connectionType, setConnectionType] = useState('unknown')
+  const [lastOnlineCheck, setLastOnlineCheck] = useState(Date.now())
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -19,18 +21,75 @@ function App() {
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
 
+  // Enhanced connectivity detection
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
+    let pingInterval: number
 
+    const checkRealConnectivity = async () => {
+      try {
+        // Try to fetch a small resource from your domain
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 3000)
+        
+        const response = await fetch('/favicon-16x16.png?t=' + Date.now(), {
+          method: 'HEAD',
+          cache: 'no-cache',
+          signal: controller.signal
+        })
+        
+        clearTimeout(timeoutId)
+        
+        if (response.ok) {
+          setIsOnline(true)
+          setConnectionType('good')
+          setLastOnlineCheck(Date.now())
+        } else {
+          setIsOnline(false)
+          setConnectionType('poor')
+        }
+      } catch (error) {
+        setIsOnline(false)
+        setConnectionType('offline')
+        console.log('Connectivity check failed:', error)
+      }
+    }
+
+    const handleOnline = () => {
+      setIsOnline(true)
+      setConnectionType('checking')
+      checkRealConnectivity()
+    }
+
+    const handleOffline = () => {
+      setIsOnline(false)
+      setConnectionType('offline')
+    }
+
+    // Initial check
+    checkRealConnectivity()
+
+    // Set up periodic connectivity checks
+    pingInterval = setInterval(checkRealConnectivity, 30000) // Check every 30 seconds
+
+    // Listen to browser events (still useful for quick detection)
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
 
+    // Listen to visibility changes (when user returns to tab)
+    const handleVisibilityChange = () => {
+      if (!document.hidden && Date.now() - lastOnlineCheck > 10000) {
+        checkRealConnectivity()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
     return () => {
+      clearInterval(pingInterval)
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [])
+  }, [lastOnlineCheck])
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return
@@ -48,14 +107,47 @@ function App() {
     setOfflineInteractions(prev => prev + 1)
   }
 
+  const handleManualConnectivityTest = async () => {
+    setConnectionType('checking')
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+      
+      const response = await fetch('/favicon-16x16.png?manual-test=' + Date.now(), {
+        method: 'HEAD',
+        cache: 'no-cache',
+        signal: controller.signal
+      })
+      
+      clearTimeout(timeoutId)
+      
+      if (response.ok) {
+        setIsOnline(true)
+        setConnectionType('good')
+        setLastOnlineCheck(Date.now())
+      } else {
+        setIsOnline(false)
+        setConnectionType('poor')
+      }
+    } catch (error) {
+      setIsOnline(false)
+      setConnectionType('offline')
+      console.log('Manual connectivity test failed:', error)
+    }
+  }
+
   return (
     <div className="App">
       <header className="app-header">
         <h1>Progressive Web App</h1>
         <h2>Proof of Concept</h2>
         <div className={`connection-status ${isOnline ? 'online' : 'offline'}`}>
-          {isOnline ? '🟢 Online' : '🔴 Offline'} - 
-          {isOnline ? ' Full functionality available' : ' Running from cache'}
+          {isOnline ? '🟢 Online' : '🔴 Offline'} 
+          {connectionType === 'checking' && ' (Verifying...)'}
+          {connectionType === 'good' && ' - Full functionality'}
+          {connectionType === 'poor' && ' - Connection issues'}
+          {connectionType === 'offline' && ' - Running from cache'}
+          {connectionType === 'unknown' && ' - Checking connection...'}
         </div>
       </header>
 
@@ -132,23 +224,31 @@ function App() {
               and notice how this app continues to work! The service worker caches all the assets.
             </p>
             
-            <div className="offline-counter">
-              <button 
-                onClick={handleOfflineInteraction}
-                className="demo-button"
-                disabled={false}
-              >
-                📱 Click Me {offlineInteractions > 0 && `(${offlineInteractions})`}
-              </button>
-              <p className="counter-text">
-                This button works {isOnline ? 'online' : 'offline'}! 
-                {!isOnline && offlineInteractions > 0 && (
-                  <span className="offline-proof"> 
-                    ✨ You clicked {offlineInteractions} time{offlineInteractions !== 1 ? 's' : ''} while offline!
-                  </span>
-                )}
-              </p>
-            </div>
+                         <div className="offline-counter">
+               <button 
+                 onClick={handleOfflineInteraction}
+                 className="demo-button"
+                 disabled={false}
+               >
+                 📱 Click Me {offlineInteractions > 0 && `(${offlineInteractions})`}
+               </button>
+               <button 
+                 onClick={handleManualConnectivityTest}
+                 className="demo-button"
+                 disabled={connectionType === 'checking'}
+                 style={{ marginLeft: '1rem' }}
+               >
+                 {connectionType === 'checking' ? '⏳ Testing...' : '🔍 Test Connection'}
+               </button>
+               <p className="counter-text">
+                 This button works {isOnline ? 'online' : 'offline'}! 
+                 {!isOnline && offlineInteractions > 0 && (
+                   <span className="offline-proof"> 
+                     ✨ You clicked {offlineInteractions} time{offlineInteractions !== 1 ? 's' : ''} while offline!
+                   </span>
+                 )}
+               </p>
+             </div>
 
             <div className="cache-status">
               <h4>📦 What's Cached & Available Offline:</h4>

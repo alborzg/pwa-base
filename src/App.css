@@ -271,6 +271,81 @@ section p {
   border-radius: 6px;
 }
 
+/* Device Information Styles */
+.device-info {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border: 2px solid #4299e1;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+
+.info-category {
+  background: #2a2a2a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #48bb78;
+}
+
+.info-category h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.info-category ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-category li {
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid #333;
+}
+
+.info-category li:last-child {
+  border-bottom: none;
+}
+
+.info-category strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.user-agent {
+  margin-top: 2rem;
+  background: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #ed8936;
+}
+
+.user-agent h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.user-agent-text {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  word-break: break-all;
+  line-height: 1.4;
+  background: #2a2a2a;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 0;
+}
+
 /* Tech Stack Badges */
 .tech-badges {
   display: flex;
@@ -334,6 +409,19 @@ section p {
   }
   
   .offline-counter, .cache-status {
+    padding: 1rem;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .info-category {
+    padding: 1rem;
+  }
+  
+  .user-agent {
     padding: 1rem;
   }
 }

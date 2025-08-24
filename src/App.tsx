@@ -8,6 +8,8 @@ function App() {
   const [offlineInteractions, setOfflineInteractions] = useState(0)
   const [connectionType, setConnectionType] = useState('unknown')
   const [lastOnlineCheck, setLastOnlineCheck] = useState(Date.now())
+  const [deviceInfo, setDeviceInfo] = useState<any>({})
+  const [networkInfo, setNetworkInfo] = useState<any>({})
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -90,6 +92,94 @@ function App() {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [lastOnlineCheck])
+
+  // Gather device and network information
+  useEffect(() => {
+    const gatherDeviceInfo = async () => {
+      const info: any = {}
+      const netInfo: any = {}
+
+      // Basic device info
+      info.userAgent = navigator.userAgent
+      info.platform = navigator.platform
+      info.language = navigator.language
+      info.languages = navigator.languages
+      info.cookieEnabled = navigator.cookieEnabled
+      info.onLine = navigator.onLine
+      info.hardwareConcurrency = navigator.hardwareConcurrency || 'Unknown'
+
+      // Screen information
+      info.screenWidth = screen.width
+      info.screenHeight = screen.height
+      info.screenColorDepth = screen.colorDepth
+      info.screenPixelDepth = screen.pixelDepth
+      info.screenOrientation = screen.orientation?.type || 'Unknown'
+
+      // Viewport information
+      info.viewportWidth = window.innerWidth
+      info.viewportHeight = window.innerHeight
+      info.devicePixelRatio = window.devicePixelRatio
+
+      // Memory information (if available)
+      if ('deviceMemory' in navigator) {
+        info.deviceMemory = (navigator as any).deviceMemory + ' GB'
+      }
+
+      // Network information (if available)
+      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
+      if (connection) {
+        netInfo.effectiveType = connection.effectiveType || 'Unknown'
+        netInfo.downlink = connection.downlink ? connection.downlink + ' Mbps' : 'Unknown'
+        netInfo.rtt = connection.rtt ? connection.rtt + ' ms' : 'Unknown'
+        netInfo.saveData = connection.saveData ? 'Enabled' : 'Disabled'
+        
+        // Listen for network changes
+        connection.addEventListener('change', () => {
+          setNetworkInfo({
+            ...netInfo,
+            effectiveType: connection.effectiveType || 'Unknown',
+            downlink: connection.downlink ? connection.downlink + ' Mbps' : 'Unknown',
+            rtt: connection.rtt ? connection.rtt + ' ms' : 'Unknown'
+          })
+        })
+      }
+
+      // Geolocation support
+      info.geolocationSupported = 'geolocation' in navigator
+      
+      // Storage estimate (if available)
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+        try {
+          const estimate = await navigator.storage.estimate()
+          info.storageQuota = estimate.quota ? Math.round(estimate.quota / 1024 / 1024) + ' MB' : 'Unknown'
+          info.storageUsage = estimate.usage ? Math.round(estimate.usage / 1024 / 1024) + ' MB' : 'Unknown'
+        } catch (e) {
+          info.storageQuota = 'Unavailable'
+          info.storageUsage = 'Unavailable'
+        }
+      }
+
+      // Permissions API
+      if ('permissions' in navigator) {
+        try {
+          const notificationPermission = await navigator.permissions.query({name: 'notifications' as PermissionName})
+          info.notificationPermission = notificationPermission.state
+        } catch (e) {
+          info.notificationPermission = 'Unavailable'
+        }
+      }
+
+      // Service Worker support
+      info.serviceWorkerSupported = 'serviceWorker' in navigator
+      info.pushManagerSupported = 'PushManager' in window
+      info.notificationSupported = 'Notification' in window
+
+      setDeviceInfo(info)
+      setNetworkInfo(netInfo)
+    }
+
+    gatherDeviceInfo()
+  }, [])
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return
@@ -267,9 +357,64 @@ function App() {
               </p>
             </div>
           </div>
-        </section>
+                  </section>
 
-        <section className="tech-stack">
+          <section className="device-info">
+            <h3>📱 Device & Network Information</h3>
+            <div className="info-grid">
+              <div className="info-category">
+                <h4>🖥️ Device Hardware</h4>
+                <ul>
+                  <li><strong>Platform:</strong> {deviceInfo.platform || 'Loading...'}</li>
+                  <li><strong>CPU Cores:</strong> {deviceInfo.hardwareConcurrency || 'Loading...'}</li>
+                  {deviceInfo.deviceMemory && <li><strong>RAM:</strong> {deviceInfo.deviceMemory}</li>}
+                  <li><strong>Screen:</strong> {deviceInfo.screenWidth}×{deviceInfo.screenHeight}</li>
+                  <li><strong>Viewport:</strong> {deviceInfo.viewportWidth}×{deviceInfo.viewportHeight}</li>
+                  <li><strong>Pixel Ratio:</strong> {deviceInfo.devicePixelRatio || 'Loading...'}</li>
+                  <li><strong>Orientation:</strong> {deviceInfo.screenOrientation}</li>
+                </ul>
+              </div>
+
+              <div className="info-category">
+                <h4>🌐 Network & Connection</h4>
+                <ul>
+                  <li><strong>Connection Type:</strong> {networkInfo.effectiveType || 'Unknown'}</li>
+                  <li><strong>Download Speed:</strong> {networkInfo.downlink || 'Unknown'}</li>
+                  <li><strong>Round Trip Time:</strong> {networkInfo.rtt || 'Unknown'}</li>
+                  <li><strong>Data Saver:</strong> {networkInfo.saveData || 'Unknown'}</li>
+                  <li><strong>Online Status:</strong> {isOnline ? 'Online' : 'Offline'}</li>
+                </ul>
+              </div>
+
+              <div className="info-category">
+                <h4>💾 Storage & Permissions</h4>
+                <ul>
+                  <li><strong>Storage Quota:</strong> {deviceInfo.storageQuota || 'Loading...'}</li>
+                  <li><strong>Storage Used:</strong> {deviceInfo.storageUsage || 'Loading...'}</li>
+                  <li><strong>Notifications:</strong> {deviceInfo.notificationPermission || 'Loading...'}</li>
+                  <li><strong>Geolocation:</strong> {deviceInfo.geolocationSupported ? 'Supported' : 'Not supported'}</li>
+                  <li><strong>Cookies:</strong> {deviceInfo.cookieEnabled ? 'Enabled' : 'Disabled'}</li>
+                </ul>
+              </div>
+
+              <div className="info-category">
+                <h4>🔧 Browser Capabilities</h4>
+                <ul>
+                  <li><strong>Service Workers:</strong> {deviceInfo.serviceWorkerSupported ? '✅ Supported' : '❌ Not supported'}</li>
+                  <li><strong>Push Manager:</strong> {deviceInfo.pushManagerSupported ? '✅ Supported' : '❌ Not supported'}</li>
+                  <li><strong>Notifications:</strong> {deviceInfo.notificationSupported ? '✅ Supported' : '❌ Not supported'}</li>
+                  <li><strong>Language:</strong> {deviceInfo.language || 'Loading...'}</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="user-agent">
+              <h4>🔍 User Agent</h4>
+              <p className="user-agent-text">{deviceInfo.userAgent || 'Loading...'}</p>
+            </div>
+          </section>
+
+          <section className="tech-stack">
           <h3>Built With</h3>
           <div className="tech-badges">
             <span className="badge">React</span>

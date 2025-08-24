@@ -10,6 +10,9 @@ function App() {
   const [lastOnlineCheck, setLastOnlineCheck] = useState(Date.now())
   const [deviceInfo, setDeviceInfo] = useState<any>({})
   const [networkInfo, setNetworkInfo] = useState<any>({})
+  const [locationData, setLocationData] = useState<any>(null)
+  const [locationError, setLocationError] = useState<string>('')
+  const [locationLoading, setLocationLoading] = useState(false)
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -226,6 +229,57 @@ function App() {
     }
   }
 
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by this browser.')
+      return
+    }
+
+    setLocationLoading(true)
+    setLocationError('')
+    setLocationData(null)
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 300000 // 5 minutes
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy, altitude, altitudeAccuracy, heading, speed } = position.coords
+        setLocationData({
+          latitude,
+          longitude,
+          accuracy,
+          altitude,
+          altitudeAccuracy,
+          heading,
+          speed,
+          timestamp: new Date(position.timestamp).toLocaleString()
+        })
+        setLocationLoading(false)
+      },
+      (error) => {
+        let errorMessage = 'Unable to retrieve location.'
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied by user.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable.'
+            break
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out.'
+            break
+        }
+        setLocationError(errorMessage)
+        setLocationLoading(false)
+      },
+      options
+    )
+  }
+
   return (
     <div className="App">
       <header className="app-header">
@@ -357,9 +411,121 @@ function App() {
               </p>
             </div>
           </div>
-                  </section>
+        </section>
 
-          <section className="device-info">
+        <section className="location-demo">
+          <h3>📍 Location Services Demo</h3>
+          <div className="demo-content">
+            <p>
+              <strong>Test geolocation:</strong> Click the button below to request your current location. 
+              Your browser will ask for permission to access your location data.
+            </p>
+            
+            <div className="location-controls">
+              <button 
+                onClick={handleGetLocation}
+                className="demo-button location-button"
+                disabled={locationLoading || !deviceInfo.geolocationSupported}
+              >
+                {locationLoading ? '📍 Getting Location...' : '📍 Get My Location'}
+              </button>
+              
+              {!deviceInfo.geolocationSupported && (
+                <p className="location-error">⚠️ Geolocation is not supported in this browser</p>
+              )}
+            </div>
+
+            {locationError && (
+              <div className="location-error">
+                <h4>❌ Location Error</h4>
+                <p>{locationError}</p>
+                <p className="error-help">
+                  <strong>Troubleshooting:</strong> Make sure location services are enabled in your browser settings 
+                  and that you granted permission when prompted.
+                </p>
+              </div>
+            )}
+
+            {locationData && (
+              <div className="location-results">
+                <h4>✅ Location Retrieved Successfully</h4>
+                <div className="location-grid">
+                  <div className="location-item">
+                    <strong>Latitude:</strong> {locationData.latitude.toFixed(6)}°
+                  </div>
+                  <div className="location-item">
+                    <strong>Longitude:</strong> {locationData.longitude.toFixed(6)}°
+                  </div>
+                  <div className="location-item">
+                    <strong>Accuracy:</strong> ±{Math.round(locationData.accuracy)}m
+                  </div>
+                  {locationData.altitude !== null && (
+                    <div className="location-item">
+                      <strong>Altitude:</strong> {Math.round(locationData.altitude)}m
+                    </div>
+                  )}
+                  {locationData.altitudeAccuracy !== null && (
+                    <div className="location-item">
+                      <strong>Altitude Accuracy:</strong> ±{Math.round(locationData.altitudeAccuracy)}m
+                    </div>
+                  )}
+                  {locationData.heading !== null && (
+                    <div className="location-item">
+                      <strong>Heading:</strong> {Math.round(locationData.heading)}°
+                    </div>
+                  )}
+                  {locationData.speed !== null && (
+                    <div className="location-item">
+                      <strong>Speed:</strong> {(locationData.speed * 3.6).toFixed(1)} km/h
+                    </div>
+                  )}
+                  <div className="location-item">
+                    <strong>Retrieved:</strong> {locationData.timestamp}
+                  </div>
+                </div>
+                
+                <div className="location-links">
+                  <p><strong>View on Maps:</strong></p>
+                  <div className="map-links">
+                    <a 
+                      href={`https://www.google.com/maps?q=${locationData.latitude},${locationData.longitude}`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="map-link"
+                    >
+                      🗺️ Google Maps
+                    </a>
+                    <a 
+                      href={`https://www.openstreetmap.org/?mlat=${locationData.latitude}&mlon=${locationData.longitude}&zoom=15`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="map-link"
+                    >
+                      🗺️ OpenStreetMap
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="location-info">
+              <h4>🔒 Privacy & Security</h4>
+              <ul>
+                <li>✅ Your location data stays in your browser</li>
+                <li>✅ No location data is sent to any server</li>
+                <li>✅ You control when location is accessed</li>
+                <li>✅ Works offline once permission is granted</li>
+              </ul>
+              
+              <p className="privacy-note">
+                <strong>Note:</strong> This demo only uses your location to display coordinates and 
+                generate map links. The location data is not stored or transmitted anywhere.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="device-info">
             <h3>📱 Device & Network Information</h3>
             <div className="info-grid">
               <div className="info-category">
